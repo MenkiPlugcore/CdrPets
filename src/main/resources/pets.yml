@@ -1,0 +1,336 @@
+pets:
+  flamefox:
+    name: '&6Emberkit'
+    forms: ['&6Emberkit', '&6Vulpyr', '&6Infernox']
+    aliases: [flamefox, 'flame fox', emberkit, vulpyr, infernox]
+    rarity: '&9RARE'
+    role: '&fBurn DPS'
+    element: fire
+    entity: FOX
+    icon: BLAZE_POWDER
+    base-health: 16
+    base-damage: 2.2
+    attack-delay-ticks: 24
+    max-evolution: 2
+  cindermite:
+    name: '&cCindermite'
+    forms: ['&cCindermite', '&cScaraburn', '&cVulcanid']
+    aliases: [cindermite, scaraburn, vulcanid]
+    rarity: '&fCOMMON'
+    role: '&fReflect Tank'
+    element: fire
+    entity: SILVERFISH
+    icon: MAGMA_CREAM
+    base-health: 22
+    base-damage: 1.7
+    attack-delay-ticks: 34
+    max-evolution: 2
+  ashpup:
+    name: '&6Ashpup'
+    forms: ['&6Ashpup', '&6Pyrohound', '&6Cerberaze']
+    aliases: [ashpup, pyrohound, cerberaze]
+    rarity: '&5EPIC'
+    role: '&fBerserker'
+    element: fire
+    entity: WOLF
+    icon: BONE
+    base-health: 18
+    base-damage: 2.5
+    attack-delay-ticks: 26
+    max-evolution: 2
+  solchick:
+    name: '&eSolchick'
+    forms: ['&eSolchick', '&eHelioroc', '&eSolphoenix']
+    aliases: [solchick, helioroc, solphoenix]
+    rarity: '&6LEGENDARY'
+    role: '&fBurst & Revival'
+    element: fire
+    entity: CHICKEN
+    icon: FEATHER
+    base-health: 17
+    base-damage: 2.7
+    attack-delay-ticks: 24
+    max-evolution: 2
+  frostwolf:
+    name: '&bFrostcub'
+    forms: ['&bFrostcub', '&bCryowarg', '&bGlacifang']
+    aliases: [frostwolf, 'frost wolf', frostcub, cryowarg, glacifang]
+    rarity: '&9RARE'
+    role: '&fFreeze Control'
+    element: ice
+    entity: WOLF
+    icon: SNOWBALL
+    base-health: 18
+    base-damage: 2.0
+    attack-delay-ticks: 28
+    max-evolution: 2
+  hailhorn:
+    name: '&fHailhorn'
+    forms: ['&fHailhorn', '&fRimehorn', '&fBorealox']
+    aliases: [hailhorn, rimehorn, borealox]
+    rarity: '&fCOMMON'
+    role: '&fGuard Breaker'
+    element: ice
+    entity: GOAT
+    icon: SNOW_BLOCK
+    base-health: 23
+    base-damage: 1.9
+    attack-delay-ticks: 32
+    max-evolution: 2
+  snowisp:
+    name: '&bSnowisp'
+    forms: ['&bSnowisp', '&bCryolume', '&bAuroriel']
+    aliases: [snowisp, cryolume, auroriel]
+    rarity: '&6LEGENDARY'
+    role: '&fDefensive Controller'
+    element: ice
+    entity: ALLAY
+    icon: GHAST_TEAR
+    base-health: 17
+    base-damage: 2.1
+    attack-delay-ticks: 26
+    max-evolution: 2
+  guardian:
+    name: '&7Pebblit'
+    forms: ['&7Pebblit', '&7Runegard', '&7Terracoloss']
+    aliases: [guardian, 'guardian golem', guardiangolem, pebblit, runegard, terracoloss]
+    rarity: '&9RARE'
+    role: '&fMain Tank'
+    element: earth
+    entity: IRON_GOLEM
+    icon: IRON_INGOT
+    base-health: 24
+    base-damage: 2.0
+    attack-delay-ticks: 36
+    max-evolution: 2
+  dustrat:
+    name: '&6Dustrat'
+    forms: ['&6Dustrat', '&6Burrowlith', '&6Quakemaw']
+    aliases: [dustrat, burrowlith, quakemaw]
+    rarity: '&fCOMMON'
+    role: '&fAmbush'
+    element: earth
+    entity: RABBIT
+    icon: RABBIT_FOOT
+    base-health: 16
+    base-damage: 2.1
+    attack-delay-ticks: 22
+    max-evolution: 2
+  craglet:
+    name: '&8Craglet'
+    forms: ['&8Craglet', '&8Bouldrake', '&8Titanorock']
+    aliases: [craglet, bouldrake, titanorock]
+    rarity: '&5EPIC'
+    role: '&fHeavy Bruiser'
+    element: earth
+    entity: RAVAGER
+    icon: COBBLESTONE
+    base-health: 27
+    base-damage: 2.5
+    attack-delay-ticks: 38
+    max-evolution: 2
+  voltlet:
+    name: '&eVoltlet'
+    forms: ['&eVoltlet', '&eStormavi', '&eRaijaroc']
+    aliases: [voltlet, stormavi, raijaroc]
+    rarity: '&5EPIC'
+    role: '&fEnergy Controller'
+    element: lightning
+    entity: PARROT
+    icon: LIGHTNING_ROD
+    base-health: 17
+    base-damage: 2.2
+    attack-delay-ticks: 22
+    max-evolution: 2
+  zapbug:
+    name: '&eZapbug'
+    forms: ['&eZapbug', '&eArcscarab', '&eTeslabeetle']
+    aliases: [zapbug, arcscarab, teslabeetle]
+    rarity: '&fCOMMON'
+    role: '&fEnergy Battery'
+    element: lightning
+    entity: ENDERMITE
+    icon: GLOWSTONE_DUST
+    base-health: 15
+    base-damage: 1.8
+    attack-delay-ticks: 20
+    max-evolution: 2
+  sparkit:
+    name: '&eSparkit'
+    forms: ['&eSparkit', '&eVoltrix', '&eThundrake']
+    aliases: [sparkit, voltrix, thundrake]
+    rarity: '&6LEGENDARY'
+    role: '&fCritical Burst'
+    element: lightning
+    entity: WARDEN
+    icon: AMETHYST_SHARD
+    base-health: 18
+    base-damage: 2.8
+    attack-delay-ticks: 26
+    max-evolution: 2
+  axibble:
+    name: '&bAxibble'
+    forms: ['&bAxibble', '&bTidolotl', '&bAbyssolotl']
+    aliases: [axibble, tidolotl, abyssolotl]
+    rarity: '&9RARE'
+    role: '&fHealer & Cleanser'
+    element: water
+    entity: AXOLOTL
+    icon: HEART_OF_THE_SEA
+    base-health: 20
+    base-damage: 1.9
+    attack-delay-ticks: 30
+    max-evolution: 2
+  bubfin:
+    name: '&3Bubfin'
+    forms: ['&3Bubfin', '&3Aquarill', '&3Tidera']
+    aliases: [bubfin, aquarill, tidera]
+    rarity: '&fCOMMON'
+    role: '&fSustain Fighter'
+    element: water
+    entity: FROG
+    icon: PRISMARINE_CRYSTALS
+    base-health: 18
+    base-damage: 2.0
+    attack-delay-ticks: 24
+    max-evolution: 2
+  shellop:
+    name: '&9Shellop'
+    forms: ['&9Shellop', '&9Turtidal', '&9Ocealith']
+    aliases: [shellop, turtidal, ocealith]
+    rarity: '&5EPIC'
+    role: '&fFortress Tank'
+    element: water
+    entity: TURTLE
+    icon: SCUTE
+    base-health: 29
+    base-damage: 1.8
+    attack-delay-ticks: 40
+    max-evolution: 2
+  sprigawn:
+    name: '&aSprigawn'
+    forms: ['&aSprigawn', '&aVerdantler', '&aSylvarion']
+    aliases: [sprigawn, verdantler, sylvarion]
+    rarity: '&9RARE'
+    role: '&fRegen Support'
+    element: nature
+    entity: GOAT
+    icon: OAK_SAPLING
+    base-health: 21
+    base-damage: 1.8
+    attack-delay-ticks: 30
+    max-evolution: 2
+  budbun:
+    name: '&dBudbun'
+    forms: ['&dBudbun', '&dFlorabbit', '&dVerdara']
+    aliases: [budbun, florabbit, verdara]
+    rarity: '&fCOMMON'
+    role: '&fFast Support'
+    element: nature
+    entity: RABBIT
+    icon: PINK_PETALS
+    base-health: 16
+    base-damage: 1.9
+    attack-delay-ticks: 20
+    max-evolution: 2
+  sporeling:
+    name: '&5Sporeling'
+    forms: ['&5Sporeling', '&5Mycospore', '&5Mycoraith']
+    aliases: [sporeling, mycospore, mycoraith]
+    rarity: '&5EPIC'
+    role: '&fPoison Debuffer'
+    element: nature
+    entity: MOOSHROOM
+    icon: RED_MUSHROOM
+    base-health: 19
+    base-damage: 2.0
+    attack-delay-ticks: 28
+    max-evolution: 2
+  thorncub:
+    name: '&2Thorncub'
+    forms: ['&2Thorncub', '&2Briarclaw', '&2Thornmaw']
+    aliases: [thorncub, briarclaw, thornmaw]
+    rarity: '&d&lMYTHIC'
+    role: '&fAdaptive Duelist'
+    element: nature
+    entity: PANDA
+    icon: VINE
+    base-health: 22
+    base-damage: 2.5
+    attack-delay-ticks: 24
+    max-evolution: 2
+  menkibun:
+    name: '&b&lMenkibun'
+    forms: ['&b&lMenkibun', '&b&lMenkira', '&3&lMenkiestes Prime']
+    aliases: [menkibun, 'menki bun', menkira, 'menkiestes prime']
+    rarity: '&b&lCUSTOM'
+    role: '&fExclusive Support'
+    element: water
+    entity: RABBIT
+    icon: RABBIT_FOOT
+    base-health: 22
+    base-damage: 2.35
+    attack-delay-ticks: 22
+    max-evolution: 2
+    custom: true
+    admin-only: true
+  icarus:
+    name: '&6&lIcarus'
+    forms: ['&6&lIcarus', '&c&lIcarus Emberwing', '&e&lIcarus Solar Ascendant']
+    aliases: [icarus, 'icarus emberwing', emberwing, 'icarus solar ascendant', 'solar ascendant', icarion]
+    rarity: '&e&lASCENDANT'
+    role: '&fBleed Control, Survival & Rebirth'
+    element: fire
+    entity: PHANTOM
+    icon: PHANTOM_MEMBRANE
+    base-health: 30
+    base-damage: 7.0
+    attack-delay-ticks: 25
+    max-evolution: 2
+    custom: true
+    admin-only: true
+  voxaur:
+    name: '&5&lVoxpertilio'
+    forms: ['&5&lVoxpertilio', '&d&lVoxera', '&5&lVoxaur']
+    aliases: [voxpertilio, voxera, voxaur, 'vox aur']
+    rarity: '&5&lCUSTOM'
+    role: '&fVoid Control & Sonic Burst'
+    element: void
+    entity: PHANTOM
+    icon: ECHO_SHARD
+    base-health: 75
+    base-damage: 3.36
+    attack-delay-ticks: 23
+    max-evolution: 2
+    custom: true
+    admin-only: true
+  thewarden:
+    name: '&3&lThe Warden'
+    forms: ['&3&lThe Warden', '&5&lThe Warden Awakened']
+    aliases: [thewarden, 'the warden', warden, 'warden pet', 'the warden awakened']
+    rarity: '&3&lCUSTOM'
+    role: '&fVoid Juggernaut & Anti-Guard'
+    element: void
+    entity: WARDEN
+    icon: SCULK_CATALYST
+    base-health: 31
+    base-damage: 3.1
+    attack-delay-ticks: 33
+    max-evolution: 1
+    custom: true
+    admin-only: true
+  vengeanceminion:
+    name: '&4&lVengeance Minion'
+    forms: ['&4&lVengeance Minion', '&c&lVengeance Minion Awakened']
+    aliases: [vengeanceminion, 'vengeance minion', vengeance, 'vengeance awakened', 'blood retribution']
+    rarity: '&4&lVENGEANCE ONLY'
+    role: '&fVoid Striker & Blood Tank'
+    element: void
+    entity: WITHER_SKELETON
+    icon: WITHER_SKELETON_SKULL
+    base-health: 32
+    base-damage: 2.4
+    attack-delay-ticks: 29
+    max-evolution: 1
+    custom: true
+    admin-only: true

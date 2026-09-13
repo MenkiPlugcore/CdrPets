@@ -1,0 +1,20 @@
+name: CdrPets
+version: '0.1.0-alpha'
+main: id.cadera.cdrpets.CdrPetsPlugin
+api-version: '1.21'
+author: CADERA
+description: Standalone MENKIESTES pet system migrated from the original Skript implementation.
+website: https://github.com/MenkiPlugcore/CdrPets
+commands:
+  pet:
+    description: Main CdrPets command.
+    usage: /pet
+    aliases: [pets]
+  petadmin:
+    description: CdrPets administration and migration tools.
+    usage: /petadmin help
+permissions:
+  cdrpets.use:
+    default: true
+  cdrpets.admin:
+    default: op
