@@ -1,4 +1,4 @@
-# CdrPets v0.1.0-alpha
+# CdrPets v0.3.1
 prefix: '&8[&b&lPET&8] &7'
 
 runtime:
@@ -27,3 +27,30 @@ progression:
 migration:
   default-skript-variables-path: 'plugins/Skript/variables.csv'
   keep-unmapped-legacy-keys: true
+
+combat:
+  disabled-worlds: []
+  energy-regen-interval-ticks: 40
+  energy-regen-amount: 5
+  skill-target-range: 12.0
+  max-direct-skill-damage-hearts: 40.0
+  dot-damage-cap-hearts-per-second: 10.0
+
+petopia:
+  disabled-worlds: []
+  global-limit: 40
+  near-player-limit: 2
+  spawn-check-interval-ticks: 600
+  spawn-chance-percent: 12
+  despawn-seconds: 180
+  capture-lock-seconds: 30
+  min-spawn-distance: 24
+  max-spawn-distance: 48
+  alpha-chance-per-thousand: 30
+  alpha-despawn-seconds: 600
+  alpha-hp-multiplier: 1.85
+  alpha-level-bonus: 5
+  alpha-capture-penalty: 25
+  hostile-aggro-radius: 14.0
+  hostile-hit-radius: 2.6
+  hostile-attack-delay-ms: 1000

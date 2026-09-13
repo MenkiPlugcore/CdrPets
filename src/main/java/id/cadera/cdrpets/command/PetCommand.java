@@ -1,11 +1,14 @@
 package id.cadera.cdrpets.command;
 
 import id.cadera.cdrpets.CdrPetsPlugin;
+import id.cadera.cdrpets.combat.SkillDefinition;
+import id.cadera.cdrpets.combat.SkillService;
 import id.cadera.cdrpets.data.PetProgress;
 import id.cadera.cdrpets.data.PlayerDataStore;
 import id.cadera.cdrpets.data.PlayerPetData;
 import id.cadera.cdrpets.model.PetDefinition;
 import id.cadera.cdrpets.model.PetMode;
+import id.cadera.cdrpets.model.SkillSlot;
 import id.cadera.cdrpets.registry.PetRegistry;
 import id.cadera.cdrpets.service.PetManager;
 import id.cadera.cdrpets.ui.PetMenu;
@@ -21,13 +24,15 @@ public final class PetCommand implements CommandExecutor, TabCompleter {
     private final PlayerDataStore store;
     private final PetManager manager;
     private final PetMenu menu;
+    private final SkillService skills;
 
-    public PetCommand(CdrPetsPlugin plugin, PetRegistry registry, PlayerDataStore store, PetManager manager, PetMenu menu) {
+    public PetCommand(CdrPetsPlugin plugin, PetRegistry registry, PlayerDataStore store, PetManager manager, PetMenu menu, SkillService skills) {
         this.plugin = plugin;
         this.registry = registry;
         this.store = store;
         this.manager = manager;
         this.menu = menu;
+        this.skills = skills;
     }
 
     @Override
@@ -71,6 +76,9 @@ public final class PetCommand implements CommandExecutor, TabCompleter {
             case "mode" -> mode(player, args);
             case "info", "stats" -> info(player, data, args.length > 1 ? join(args, 1) : data.selectedPet());
             case "evolve", "evolusi" -> evolve(player, data);
+            case "skill", "cast" -> useSkill(player, args);
+            case "skills", "skillinfo" -> skillInfo(player, data);
+            case "energy" -> plugin.message(player, "&7Energy &f" + data.selectedPet() + "&7: &e" + data.progress(data.selectedPet()).energy() + "&7/" + plugin.getConfig().getInt("progression.energy-max", 100));
             default -> plugin.message(player, "&cSubcommand tidak ditemukan. Gunakan &f/pet help&c.");
         }
         return true;
@@ -202,6 +210,33 @@ public final class PetCommand implements CommandExecutor, TabCompleter {
         if (data.active()) manager.summon(player);
     }
 
+
+    private void useSkill(Player player, String[] args) {
+        if (args.length < 2) {
+            plugin.message(player, "&cGunakan: /pet skill <1|2|3|4|ultimate>");
+            return;
+        }
+        SkillSlot slot = SkillSlot.parse(args[1]);
+        if (slot == null) {
+            plugin.message(player, "&cSlot skill tidak valid.");
+            return;
+        }
+        skills.use(player, slot);
+    }
+
+    private void skillInfo(Player player, PlayerPetData data) {
+        String petId = data.selectedPet();
+        player.sendMessage(Colors.color("&8&m--------------------------------"));
+        player.sendMessage(Colors.color("&b&lSKILLS &8• &f" + petId));
+        for (SkillDefinition skill : skills.skillsFor(petId)) {
+            long cooldown = skills.cooldownRemaining(player.getUniqueId(), petId, skill.slot());
+            String cd = cooldown > 0 ? " &8• &cCD " + String.format(Locale.US, "%.1fs", cooldown / 20.0) : " &8• &aREADY";
+            player.sendMessage(Colors.color("&f" + skill.slot().key() + ". " + skill.name() + " &8• &e" + skill.energyCost() + " Energy &8• &7Lv." + skill.requiredLevel() + cd));
+            player.sendMessage(Colors.color("   &8↳ &7" + skill.description()));
+        }
+        player.sendMessage(Colors.color("&8&m--------------------------------"));
+    }
+
     private void list(Player player, PlayerPetData data) {
         player.sendMessage(Colors.color("&8&m--------------------------------"));
         player.sendMessage(Colors.color("&b&lCDRPETS COLLECTION &8• &f" + registry.size() + " PET"));
@@ -224,6 +259,9 @@ public final class PetCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(Colors.color("&f/pet mode <follow/defend/stay>"));
         player.sendMessage(Colors.color("&f/pet info [pet] &8- &7Lihat stats"));
         player.sendMessage(Colors.color("&f/pet evolve &8- &7Evolusi pet terpilih"));
+        player.sendMessage(Colors.color("&f/pet skill <1|2|3|4|ultimate> &8- &7Gunakan skill PvE"));
+        player.sendMessage(Colors.color("&f/pet skills &8- &7Lihat skill, cost, dan cooldown"));
+        player.sendMessage(Colors.color("&f/pet energy &8- &7Lihat Energy pet"));
         player.sendMessage(Colors.color("&8&m--------------------------------"));
     }
 
@@ -240,7 +278,10 @@ public final class PetCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!(sender instanceof Player player)) return List.of();
         if (args.length == 1) {
-            return filter(args[0], List.of("menu", "list", "pilih", "summon", "dismiss", "recall", "mode", "info", "evolve", "help"));
+            return filter(args[0], List.of("menu", "list", "pilih", "summon", "dismiss", "recall", "mode", "info", "evolve", "skill", "skills", "energy", "help"));
+        }
+        if (args.length == 2 && (args[0].equalsIgnoreCase("skill") || args[0].equalsIgnoreCase("cast"))) {
+            return filter(args[1], List.of("1", "2", "3", "4", "ultimate"));
         }
         if (args.length == 2 && (args[0].equalsIgnoreCase("mode"))) {
             return filter(args[1], List.of("follow", "defend", "stay"));

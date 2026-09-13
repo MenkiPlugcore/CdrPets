@@ -53,6 +53,15 @@ public final class PlayerDataStore {
         yaml.set("essence", data.essence());
         yaml.set("unlocked", new ArrayList<>(data.unlocked()));
         yaml.set("favorites", new ArrayList<>(data.favorites()));
+        yaml.set("petopia.seen", new ArrayList<>(data.petopiaSeen()));
+        yaml.set("petopia.caught", new ArrayList<>(data.petopiaCaught()));
+        yaml.set("petopia.alpha-caught", new ArrayList<>(data.petopiaAlphaCaught()));
+        yaml.set("petopia.starter-claimed", data.petopiaStarterClaimed());
+        yaml.set("petopia.total-captures", data.petopiaTotalCaptures());
+        yaml.set("petopia.alpha-captures", data.petopiaAlphaCaptures());
+        for (Map.Entry<String, Integer> entry : data.petopiaCaptureCounts().entrySet()) {
+            yaml.set("petopia.capture-counts." + entry.getKey(), entry.getValue());
+        }
         for (Map.Entry<String, Long> entry : data.evolutionMaterials().entrySet()) {
             yaml.set("evolution-materials." + entry.getKey(), entry.getValue());
         }
@@ -109,6 +118,16 @@ public final class PlayerDataStore {
         data.unlocked().addAll(yaml.getStringList("unlocked"));
         data.unlocked().add("flamefox");
         data.favorites().addAll(yaml.getStringList("favorites"));
+        data.petopiaSeen().addAll(yaml.getStringList("petopia.seen"));
+        data.petopiaCaught().addAll(yaml.getStringList("petopia.caught"));
+        data.petopiaAlphaCaught().addAll(yaml.getStringList("petopia.alpha-caught"));
+        data.petopiaStarterClaimed(yaml.getBoolean("petopia.starter-claimed", false));
+        data.petopiaTotalCaptures(yaml.getLong("petopia.total-captures", 0L));
+        data.petopiaAlphaCaptures(yaml.getLong("petopia.alpha-captures", 0L));
+        ConfigurationSection captureCounts = yaml.getConfigurationSection("petopia.capture-counts");
+        if (captureCounts != null) {
+            for (String key : captureCounts.getKeys(false)) data.petopiaCaptureCounts().put(key, captureCounts.getInt(key, 0));
+        }
         ConfigurationSection materials = yaml.getConfigurationSection("evolution-materials");
         if (materials != null) {
             for (String key : materials.getKeys(false)) data.evolutionMaterial(key, materials.getLong(key, 0L));

@@ -2,7 +2,7 @@
 
 Standalone Minecraft pet plugin by **CADERA**, migrated from the MENKIESTES Pet System Skript codebase.
 
-> Status: **v0.1.0-alpha — Core Foundation**. The original archive contains 64 Skript modules / ~47k lines, so the migration is intentionally modular instead of copying the old monolith into Java.
+Current development release: **v0.3.1 — Combat + PETOPIA + Capture**.
 
 ## Target
 
@@ -10,30 +10,71 @@ Standalone Minecraft pet plugin by **CADERA**, migrated from the MENKIESTES Pet 
 - Java 21
 - No Skript dependency
 - Java + Bedrock friendly inventory UI
+- PDC-based runtime identity for companion and Wild Pet entities
 
-## Implemented in v0.1.0-alpha
+## Core companion system
 
-- 20 original progression pets + 5 custom/admin-only pets
-- Pet registry in `pets.yml`
-- Per-player YAML persistence
-- Summon / dismiss / recall
-- FOLLOW / DEFEND / STAY modes
-- Basic PvE defend targeting and pet attacks
-- One-pet-per-owner runtime guarantee
-- PersistentDataContainer identity tags
-- Startup/chunk orphan-pet cleanup
-- Collection GUI using vanilla inventory packets
-- Level, EXP, Energy, Evolution, Essence, Mastery and Bond persistence fields
-- Evolution I / Final Evolution material flow
-- Special Icarus evolution requirements
-- Admin unlock/lock, level/evolution, Essence/material tools
-- Legacy Skript `variables.csv` importer for core progression data
-- Atomic-ish player save strategy (temp + replace fallback)
-- GitHub Actions compile/build pipeline
+- 20 original progression pets + 5 custom/admin-only pets.
+- Summon / dismiss / recall.
+- FOLLOW / DEFEND / STAY modes.
+- Per-player YAML persistence.
+- Level, EXP, Energy, Evolution, Essence, Mastery and Bond data.
+- Evolution I / Final Evolution plus special Icarus requirements.
+- Orphan companion cleanup on restart/chunk lifecycle.
 
-## Core commands
+## Skills & Combat
 
-- `/pet` — open collection GUI
+Commands:
+
+- `/pet skill <1|2|3|4|ultimate>`
+- `/pet skills`
+- `/pet energy`
+
+The Java combat core now handles Energy costs/regeneration, level gates, cooldowns, direct damage, healing, lifesteal, resistance, regeneration and status effects. Implemented statuses include Burn, Poison, Bleed, Freeze, Stun, Root, Slow, Silence and Weakness.
+
+The original pet roles are kept: Burn DPS, Reflect Tank, Berserker, Revival, Freeze Control, Guard Breaker, Healer, Fortress Tank, Poison Debuffer and others. Custom handlers are included for Menkibun, Icarus, Voxaur, The Warden and Vengeance Minion.
+
+## PETOPIA
+
+Initial Wild Pet release roster:
+
+`flamefox`, `ashpup`, `solchick`, `dustrat`, `hailhorn`, `voltlet`, `axibble`, `budbun`, `cindermite`, `zapbug`.
+
+Default runtime parity with the Skript system:
+
+- global Wild Pet cap: 40
+- max nearby Wild Pets: 2
+- natural spawn roll: 12% every 30 seconds
+- normal despawn: 180 seconds
+- Alpha roll: 30/1000
+- Alpha HP multiplier: 1.85x
+- Alpha encounter level bonus: +5
+- Alpha despawn: 600 seconds
+
+Player commands:
+
+- `/petopia`
+- `/petopia dex`
+- `/petopia near`
+- `/petopia starter`
+
+## Capture
+
+Capture Orb tiers:
+
+- Basic Pet Orb: 30% base chance
+- Great Pet Orb: 55% base chance
+- Master Pet Orb: 100%
+
+Non-Master capture requires Wild Pet HP <=50%. Alpha capture requires Great/Master Orb and <=25% HP unless using Master Orb.
+
+The capture formula follows the legacy system: HP bonus, rarity penalty and a 25-point Alpha penalty, capped at 95% for normal encounters and 85% for Alpha encounters.
+
+A newly captured species unlocks at Level 1. Duplicate captures convert into Pet Essence, with higher rewards for rarer and Alpha encounters. Legacy Skript Capture Orbs are recognized through their old lore markers when possible.
+
+## Main commands
+
+- `/pet` — collection GUI
 - `/pet pilih <pet>`
 - `/pet summon [pet]`
 - `/pet dismiss`
@@ -41,9 +82,12 @@ Standalone Minecraft pet plugin by **CADERA**, migrated from the MENKIESTES Pet 
 - `/pet mode <follow|defend|stay>`
 - `/pet info [pet]`
 - `/pet evolve`
-- `/pet list`
+- `/pet skill <1|2|3|4|ultimate>`
+- `/pet skills`
+- `/pet energy`
+- `/petopia [status|dex|starter|near]`
 
-Admin:
+Admin highlights:
 
 - `/petadmin unlock <player> <pet>`
 - `/petadmin lock <player> <pet>`
@@ -51,6 +95,11 @@ Admin:
 - `/petadmin setevolution <player> <pet> <stage>`
 - `/petadmin giveessence <player> <amount>`
 - `/petadmin givematerial <player> <key> <amount>`
+- `/petadmin combatdebug <player>`
+- `/petadmin clearcooldowns <player>`
+- `/petadmin spawnwild <pet> [level] [alpha]`
+- `/petadmin cleanupwild`
+- `/petadmin giveorb <player> <basic|great|master> <amount>`
 - `/petadmin importskript [path]`
 - `/petadmin cleanup`
 - `/petadmin reload`
@@ -58,37 +107,24 @@ Admin:
 
 ## Legacy migration
 
-1. Stop using the old pet Skript before production cutover.
-2. Keep a backup of `plugins/Skript/variables.csv`.
+1. Stop the old pet Skripts before the production cutover.
+2. Back up `plugins/Skript/variables.csv`.
 3. Install CdrPets and start the server once.
-4. Run `/petadmin importskript` (default path: `plugins/Skript/variables.csv`).
-5. Review `plugins/CdrPets/legacy-unmapped.csv` for keys not yet handled by the Java migration layer.
-6. Test pet ownership, levels, evolution, mastery/bond and custom pets on a staging server before removing the old scripts permanently.
+4. Run `/petadmin importskript`.
+5. Review `plugins/CdrPets/legacy-unmapped.csv`.
+6. Test on staging before permanently removing the Skript modules.
 
-The importer currently maps the high-value persistent families: selected pet, mode, unlocked/favorite pets, level, EXP, Energy, Evolution, Essence, Evolution materials, Mastery and Bond progression. Unknown `mpet.*` keys are preserved for later module ports instead of silently discarded.
+The importer includes core progression plus PETOPIA starter receipt, seen/caught Dex, capture counts, Alpha Dex and capture totals. Unknown legacy keys remain available in `legacy-unmapped.csv` instead of being silently discarded.
 
-## Migration roadmap
+## Next roadmap
 
-### v0.2 — Skills & Combat Parity
-Port active skills, Energy economy, elements, status effects, target/threat roles and custom pet mechanics.
-
-### v0.3 — PETOPIA & Capture
-Wild pet registry, hostile encounters, capture orb tiers, Alpha encounters, claim safety and Pet Dex.
-
-### v0.4 — Battle / Ranked / Team
-1v1 battle state machine, GUI/action fallback, ranked arena, party/team battle and loadout synergy.
-
-### v0.5 — Tower Progression
-Tower, Endless Tower, blessings, relic draft/codex, seasonal mutators, challenges, milestones and leaderboard rewards.
-
-### v0.6 — Lifestyle & Meta
-Bond/cosmetics, personality/memory/routine, expedition, pet work, research, achievements, missions and contracts.
-
-### v0.7 — Tournament & Telemetry
-Tournament, spectator HUD/history, battle history, balance telemetry and admin recovery monitoring.
-
-### v1.0 — Production Cutover
-Full migration verification, performance soak test, exploit audit, migration freeze and release build.
+- **v0.4.0** — Pet Battle state machine.
+- **v0.4.1** — Ranked & matchmaking.
+- **v0.4.2** — Party / Team Battle.
+- **v0.5.x** — Tower, Endless Tower, Relics and challenges.
+- **v0.6.x** — Bond, Lifestyle, Expedition, Research, Missions and Cosmetics.
+- **v0.7.x** — Tournament, spectator HUD and telemetry.
+- **v1.0.0** — final production cutover from Skript.
 
 ## License
 

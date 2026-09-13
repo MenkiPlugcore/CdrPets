@@ -45,7 +45,7 @@ public final class SkriptVariablesImporter {
                     continue;
                 }
                 String key = cleanKey(columns.get(0));
-                if (!key.startsWith("mpet.")) continue;
+                if (!key.startsWith("mpet.") && !key.startsWith("mpetopia.") && !key.startsWith("mpcapture.")) continue;
                 seen++;
                 String value = columns.get(1).trim();
                 ApplyResult result = apply(key, value);
@@ -75,6 +75,32 @@ public final class SkriptVariablesImporter {
         PlayerPetData data = store.get(uuid);
 
         try {
+            if (family.equals("mpetopia.starter.receipt")) {
+                data.petopiaStarterClaimed(parseBoolean(value));
+                return ApplyResult.yes(uuid);
+            }
+            if (family.equals("mpetopia.alpha.total")) {
+                data.petopiaAlphaCaptures((long) parseDouble(value));
+                return ApplyResult.yes(uuid);
+            }
+            if (family.equals("mpcapture.player")) {
+                if (parts.length >= 3 && parts[2].equalsIgnoreCase("captures")) {
+                    data.petopiaTotalCaptures((long) parseDouble(value));
+                    return ApplyResult.yes(uuid);
+                }
+            }
+            if (family.equals("mpetopia.dex.seen") || family.equals("mpetopia.dex.caught") || family.equals("mpetopia.dex.capturecount") || family.equals("mpetopia.dex.alpha")) {
+                if (parts.length < 3) return ApplyResult.no(uuid);
+                String pet = registry.normalize(parts[2]);
+                if (pet == null) return ApplyResult.no(uuid);
+                switch (family) {
+                    case "mpetopia.dex.seen" -> { if (parseBoolean(value)) data.petopiaSeen().add(pet); }
+                    case "mpetopia.dex.caught" -> { if (parseBoolean(value)) data.petopiaCaught().add(pet); }
+                    case "mpetopia.dex.alpha" -> { if (parseBoolean(value)) data.petopiaAlphaCaught().add(pet); }
+                    case "mpetopia.dex.capturecount" -> data.petopiaCaptureCounts().put(pet, Math.max(0, (int) parseDouble(value)));
+                }
+                return ApplyResult.yes(uuid);
+            }
             switch (family) {
                 case "mpet.type" -> {
                     String pet = registry.normalize(value);

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>id.cadera</groupId>
   <artifactId>cdrpets</artifactId>
-  <version>0.1.0-alpha</version>
+  <version>0.3.1</version>
   <name>CdrPets</name>
   <description>Standalone MENKIESTES pet system by CADERA.</description>
   <properties>

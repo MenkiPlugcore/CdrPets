@@ -54,8 +54,11 @@ public final class PetManager {
         if (task != null) task.cancel();
         for (UUID ownerId : new ArrayList<>(activePets.keySet())) {
             Player player = Bukkit.getPlayer(ownerId);
-            if (player != null) dismiss(player, false, true);
-            else removeEntityOnly(ownerId);
+            if (player != null) {
+                dismiss(player, false, true);
+            } else {
+                removeEntityOnly(ownerId);
+            }
         }
         activePets.clear();
         petOwners.clear();
@@ -154,8 +157,17 @@ public final class PetManager {
         if (owner == null || target == null || target.isDead()) return;
         if (target instanceof Player && !plugin.getConfig().getBoolean("runtime.allow-open-world-pvp", false)) return;
         PlayerPetData data = store.get(owner.getUniqueId());
-        if (data.mode() != PetMode.DEFEND || isPet(target)) return;
+        if (data.mode() != PetMode.DEFEND) return;
+        if (isPet(target)) return;
         combatTargets.put(owner.getUniqueId(), target.getUniqueId());
+    }
+
+    public LivingEntity getCombatTarget(UUID owner) {
+        return resolveTarget(owner);
+    }
+
+    public void clearCombatTarget(UUID owner) {
+        combatTargets.remove(owner);
     }
 
     public LivingEntity getActivePet(UUID owner) {
@@ -266,6 +278,7 @@ public final class PetManager {
                 pet.teleport(safeFollowLocation(owner));
                 continue;
             }
+
             PlayerPetData data = store.get(ownerId);
             LivingEntity target = resolveTarget(ownerId);
             if (data.mode() == PetMode.DEFEND && target != null && target.getWorld().equals(owner.getWorld()) && target.getLocation().distanceSquared(owner.getLocation()) <= targetRange * targetRange) {
@@ -283,8 +296,9 @@ public final class PetManager {
             combatTargets.remove(owner.getUniqueId());
             return;
         }
-        if (pet.getLocation().distanceSquared(target.getLocation()) > 10.24) return;
-        PetDefinition def = registry.get(typeOf(pet));
+        if (pet.getLocation().distanceSquared(target.getLocation()) > 3.2 * 3.2) return;
+        String type = typeOf(pet);
+        PetDefinition def = registry.get(type);
         if (def == null) return;
         long next = nextAttackTick.getOrDefault(owner.getUniqueId(), 0L);
         if (tick < next) return;
@@ -293,7 +307,7 @@ public final class PetManager {
         double damage = totalDamage(def, progress.level(), Math.min(progress.evolution(), def.maxEvolution()));
         nextAttackTick.put(owner.getUniqueId(), tick + def.attackDelayTicks());
         target.getWorld().spawnParticle(Particle.CRIT, target.getLocation().add(0, target.getHeight() * 0.6, 0), 6, 0.2, 0.2, 0.2, 0.05);
-        target.damage(Math.max(0.1, damage * 2.0), pet);
+        target.damage(Math.max(0.1, damage * 2.0), pet); // Skript damage values were expressed in hearts.
         if (target.isDead() || target.getHealth() <= 0.01) {
             combatTargets.remove(owner.getUniqueId());
             addXp(owner, def.id(), 25);
@@ -308,7 +322,9 @@ public final class PetManager {
             pet.teleport(safeFollowLocation(owner));
             return;
         }
-        if (distanceSquared > start * start) moveTowards(pet, safeFollowLocation(owner), 1.15);
+        if (distanceSquared > start * start) {
+            moveTowards(pet, safeFollowLocation(owner), 1.15);
+        }
     }
 
     private void moveTowards(LivingEntity pet, Location destination, double step) {
@@ -349,7 +365,8 @@ public final class PetManager {
     private boolean isTracked(Entity entity) {
         UUID owner = ownerOf(entity);
         if (owner == null) return false;
-        return entity.getUniqueId().equals(activePets.get(owner));
+        UUID tracked = activePets.get(owner);
+        return entity.getUniqueId().equals(tracked);
     }
 
     private void removeEntityOnly(UUID ownerId) {

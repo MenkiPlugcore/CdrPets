@@ -1,6 +1,11 @@
 package id.cadera.cdrpets.command;
 
 import id.cadera.cdrpets.CdrPetsPlugin;
+import id.cadera.cdrpets.combat.CombatStatusService;
+import id.cadera.cdrpets.combat.SkillService;
+import id.cadera.cdrpets.capture.CaptureService;
+import id.cadera.cdrpets.capture.OrbType;
+import id.cadera.cdrpets.petopia.WildPetManager;
 import id.cadera.cdrpets.data.PetProgress;
 import id.cadera.cdrpets.data.PlayerDataStore;
 import id.cadera.cdrpets.data.PlayerPetData;
@@ -23,13 +28,21 @@ public final class PetAdminCommand implements CommandExecutor, TabCompleter {
     private final PlayerDataStore store;
     private final PetManager manager;
     private final SkriptVariablesImporter importer;
+    private final CombatStatusService statuses;
+    private final SkillService skills;
+    private final WildPetManager wilds;
+    private final CaptureService capture;
 
-    public PetAdminCommand(CdrPetsPlugin plugin, PetRegistry registry, PlayerDataStore store, PetManager manager, SkriptVariablesImporter importer) {
+    public PetAdminCommand(CdrPetsPlugin plugin, PetRegistry registry, PlayerDataStore store, PetManager manager, SkriptVariablesImporter importer, CombatStatusService statuses, SkillService skills, WildPetManager wilds, CaptureService capture) {
         this.plugin = plugin;
         this.registry = registry;
         this.store = store;
         this.manager = manager;
         this.importer = importer;
+        this.statuses = statuses;
+        this.skills = skills;
+        this.wilds = wilds;
+        this.capture = capture;
     }
 
     @Override
@@ -65,6 +78,11 @@ public final class PetAdminCommand implements CommandExecutor, TabCompleter {
                     plugin.message(sender, "&aSemua data cache disimpan.");
                 }
                 case "debug" -> debug(sender, args);
+                case "combatdebug" -> combatDebug(sender, args);
+                case "clearcooldowns" -> clearCooldowns(sender, args);
+                case "spawnwild" -> spawnWild(sender, args);
+                case "cleanupwild" -> cleanupWild(sender);
+                case "giveorb" -> giveOrb(sender, args);
                 case "importskript" -> importSkript(sender, args);
                 default -> plugin.message(sender, "&cSubcommand admin tidak dikenal. /petadmin help");
             }
@@ -155,6 +173,63 @@ public final class PetAdminCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(Colors.color("&8&m--------------------------------"));
     }
 
+
+    private void combatDebug(CommandSender sender, String[] args) {
+        if (args.length < 2) throw new IllegalArgumentException("/petadmin combatdebug <player>");
+        OfflinePlayer target = findPlayer(args[1]);
+        Player online = target.getPlayer();
+        PlayerPetData data = store.get(target.getUniqueId());
+        sender.sendMessage(Colors.color("&8&m--------------------------------"));
+        sender.sendMessage(Colors.color("&b&lCDRPETS COMBAT DEBUG &8• &f" + displayName(target)));
+        sender.sendMessage(Colors.color("&7Pet: &f" + data.selectedPet() + " &8• &7Energy: &e" + data.progress(data.selectedPet()).energy()));
+        sender.sendMessage(Colors.color("&7Cooldowns: &f" + skills.cooldownSummary(target.getUniqueId(), data.selectedPet())));
+        var entity = manager.getActivePet(target.getUniqueId());
+        sender.sendMessage(Colors.color("&7Runtime pet: &f" + (entity == null ? "none" : entity.getUniqueId())));
+        var combatTarget = manager.getCombatTarget(target.getUniqueId());
+        sender.sendMessage(Colors.color("&7Target: &f" + (combatTarget == null ? "none" : combatTarget.getType() + "/" + combatTarget.getUniqueId())));
+        if (combatTarget != null) sender.sendMessage(Colors.color("&7Target statuses: &f" + statuses.describe(combatTarget)));
+        if (online != null) sender.sendMessage(Colors.color("&7World: &f" + online.getWorld().getName()));
+        sender.sendMessage(Colors.color("&8&m--------------------------------"));
+    }
+
+    private void clearCooldowns(CommandSender sender, String[] args) {
+        if (args.length < 2) throw new IllegalArgumentException("/petadmin clearcooldowns <player>");
+        OfflinePlayer target = findPlayer(args[1]);
+        skills.clearCooldowns(target.getUniqueId());
+        plugin.message(sender, "&aCooldown skill dibersihkan untuk &f" + displayName(target) + "&a.");
+    }
+
+
+    private void spawnWild(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player player)) throw new IllegalArgumentException("/petadmin spawnwild harus dijalankan player agar punya lokasi spawn.");
+        if (args.length < 2) throw new IllegalArgumentException("/petadmin spawnwild <pet> [level] [alpha]");
+        String petId = registry.normalize(args[1]);
+        if (petId == null || !WildPetManager.RELEASE_SPECIES.contains(petId)) throw new IllegalArgumentException("Pet bukan species PETOPIA release.");
+        int level = args.length >= 3 ? Integer.parseInt(args[2]) : 1;
+        boolean alpha = args.length >= 4 && args[3].equalsIgnoreCase("alpha");
+        var location = player.getTargetBlockExact(12) == null ? player.getLocation().add(player.getLocation().getDirection().multiply(3)) : player.getTargetBlockExact(12).getLocation().add(0.5, 1, 0.5);
+        var entity = wilds.spawn(petId, level, location, alpha, "ADMIN:" + sender.getName());
+        plugin.message(sender, entity == null ? "&cGagal spawn Wild Pet." : "&aWild Pet spawned: &f" + petId + " &8• &7Lv.&f" + wilds.level(entity) + (wilds.isAlpha(entity) ? " &5✦ALPHA" : ""));
+    }
+
+    private void cleanupWild(CommandSender sender) {
+        int count = wilds.activeEntities().size();
+        for (var entity : new ArrayList<>(wilds.activeEntities())) wilds.remove(entity, true);
+        plugin.message(sender, "&aPETOPIA cleanup: &f" + count + " &aWild Pet dihapus.");
+    }
+
+    private void giveOrb(CommandSender sender, String[] args) {
+        if (args.length < 4) throw new IllegalArgumentException("/petadmin giveorb <player> <basic|great|master> <amount>");
+        OfflinePlayer target = findPlayer(args[1]);
+        Player online = target.getPlayer();
+        if (online == null) throw new IllegalArgumentException("Player harus online untuk menerima Orb.");
+        OrbType type = OrbType.parse(args[2]);
+        if (type == null) throw new IllegalArgumentException("Orb harus basic/great/master.");
+        int amount = Math.max(1, Integer.parseInt(args[3]));
+        capture.giveOrb(online, type, amount, true);
+        plugin.message(sender, "&aDiberikan &f" + amount + "x " + type.key() + " orb &ake &f" + online.getName() + "&a.");
+    }
+
     private void importSkript(CommandSender sender, String[] args) throws Exception {
         String configured = plugin.getConfig().getString("migration.default-skript-variables-path", "plugins/Skript/variables.csv");
         File file = new File(args.length >= 2 ? join(args, 1) : configured);
@@ -189,6 +264,11 @@ public final class PetAdminCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(Colors.color("&f/petadmin cleanup &8- &7hapus orphan pet CdrPets"));
         sender.sendMessage(Colors.color("&f/petadmin reload &8- &7reload config + pets.yml"));
         sender.sendMessage(Colors.color("&f/petadmin debug <player>"));
+        sender.sendMessage(Colors.color("&f/petadmin combatdebug <player>"));
+        sender.sendMessage(Colors.color("&f/petadmin clearcooldowns <player>"));
+        sender.sendMessage(Colors.color("&f/petadmin spawnwild <pet> [level] [alpha]"));
+        sender.sendMessage(Colors.color("&f/petadmin cleanupwild"));
+        sender.sendMessage(Colors.color("&f/petadmin giveorb <player> <basic|great|master> <amount>"));
         sender.sendMessage(Colors.color("&8&m--------------------------------"));
     }
 
@@ -203,12 +283,18 @@ public final class PetAdminCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!sender.hasPermission("cdrpets.admin")) return List.of();
-        if (args.length == 1) return filter(args[0], List.of("help", "reload", "cleanup", "unlock", "lock", "setlevel", "setevolution", "giveessence", "givematerial", "importskript", "saveall", "debug"));
-        if (args.length == 2 && !args[0].equalsIgnoreCase("importskript")) {
+        if (args.length == 1) return filter(args[0], List.of("help", "reload", "cleanup", "unlock", "lock", "setlevel", "setevolution", "giveessence", "givematerial", "importskript", "saveall", "debug", "combatdebug", "clearcooldowns", "spawnwild", "cleanupwild", "giveorb"));
+        if (args.length == 2 && args[0].equalsIgnoreCase("spawnwild")) {
+            return filter(args[1], WildPetManager.RELEASE_SPECIES);
+        }
+        if (args.length == 2 && !args[0].equalsIgnoreCase("importskript") && !args[0].equalsIgnoreCase("spawnwild")) {
             return filter(args[1], Bukkit.getOnlinePlayers().stream().map(Player::getName).toList());
         }
         if (args.length == 3 && Set.of("unlock", "lock", "setlevel", "setevolution").contains(args[0].toLowerCase(Locale.ROOT))) {
             return filter(args[2], registry.all().stream().map(PetDefinition::id).toList());
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("giveorb")) {
+            return filter(args[2], List.of("basic", "great", "master"));
         }
         if (args.length == 3 && args[0].equalsIgnoreCase("givematerial")) {
             List<String> keys = new ArrayList<>(List.of("shard", "icarus_feather", "icarus_ascendant_core"));

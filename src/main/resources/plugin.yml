@@ -1,5 +1,5 @@
 name: CdrPets
-version: '0.1.0-alpha'
+version: '0.3.1'
 main: id.cadera.cdrpets.CdrPetsPlugin
 api-version: '1.21'
 author: CADERA
@@ -13,6 +13,9 @@ commands:
   petadmin:
     description: CdrPets administration and migration tools.
     usage: /petadmin help
+  petopia:
+    description: PETOPIA wild-pet and capture commands.
+    usage: /petopia
 permissions:
   cdrpets.use:
     default: true
